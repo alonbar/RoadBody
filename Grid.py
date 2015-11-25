@@ -5,7 +5,7 @@ class TimeGrid(object):
     """
     TIME_BUCKET = 10*60*1000 # 10 minutes
     TIME_FRAME = 7*24*60*60*1000
-    LIMIT = 60*60*1000
+    LIMIT = 10*60*60*1000
     COORDINATE_RESOLUTION = math.pow(10,7)
     def __init__(self, userData, dx, dy):
         """
@@ -25,20 +25,13 @@ class TimeGrid(object):
         gridEndX = max(location["longitude"] for location in userData) + self.dx
         gridEndY = max(location["latitude"] for location in userData) + self.dy
 
-        xAmount = (gridEndX - self.gridStartX) / self.dx + 1
-        yAmount = (gridEndY - self.gridStartY) / self.dy + 1
-        timeAmount = self.TIME_FRAME / self.TIME_BUCKET + 1
-        self.usersStartMatrix = [[[set()]*xAmount] * yAmount]*timeAmount
-        self.usersEndMatrix = [[[set()]*xAmount] * yAmount]*timeAmount
+        xAmount = int((gridEndX - self.gridStartX) / self.dx + 1)
+        yAmount = int((gridEndY - self.gridStartY) / self.dy + 1)
+        timeAmount = int(self.TIME_FRAME / self.TIME_BUCKET + 1)
+        print (xAmount, yAmount, timeAmount)
+        self.usersStartMatrix = [[[set()]*timeAmount] * yAmount]*xAmount
+        self.usersEndMatrix = [[[set()]*timeAmount] * yAmount]*xAmount
 
-    def _normalizeTime(self, timeTuple):
-        """
-
-        :param timeTuple:
-        :return:
-        """
-        day, hour, minute = timeTuple
-        return (((hour)*60) + minute)*60*1000
 
     def distanceOnUnitSphere(self, lat1, long1, lat2, long2):
         """
@@ -87,11 +80,11 @@ class TimeGrid(object):
         :param endTime:
         :return:
         """
-        gridX = (longitude - self.gridStartX) / self.dx
-        gridY = (latitude - self.gridStartY) / self.dy
-        gridStartTime = self._normalizeTime(startTime) / self.TIME_BUCKET
-        gridEndTime = self._normalizeTime(endTime) / self.TIME_BUCKET
-
+        gridX = int((longitude - self.gridStartX) / self.dx)
+        gridY = int((latitude - self.gridStartY) / self.dy)
+        gridStartTime = int(startTime / self.TIME_BUCKET)
+        gridEndTime = int(endTime / self.TIME_BUCKET)
+        print("asd")
         self.usersStartMatrix[gridX][gridY][gridStartTime].add(userId)
         self.usersEndMatrix[gridX][gridY][gridEndTime].add(userId)
 
@@ -104,7 +97,10 @@ class TimeGrid(object):
         """
         for friendId, data in friendsData.items():
             # TODO: check if we need to filter by day
-            self.enterUserToGrid(friendId, data["longitude"], data["latitude"], data["start_hour"], data["end_hour"])
+            for location in data:
+                self.enterUserToGrid(friendId, location["longitude"], location["latitude"], location["start_hour"], location["end_hour"])
+
+
 
     def getFriendsByLocation(self, location, radius, timeRadius, byExitTime):
         """
@@ -115,19 +111,17 @@ class TimeGrid(object):
         :param byExitTime:
         :return:
         """
-        gridX = (location["longitude"] - self.gridStartX) / self.dx
-        gridY = (location["latitude"] - self.gridStartY) / self.dy
-        gridStartTime = self._normalizeTime(location["start_hour"]) / self.TIME_BUCKET
-        gridEndTime = self._normalizeTime(location["end_hour"]) / self.TIME_BUCKET
+        gridX = int((location["longitude"] - self.gridStartX) / self.dx)
+        gridY = int((location["latitude"] - self.gridStartY) / self.dy)
+        gridStartTime = int(location["start_hour"] / self.TIME_BUCKET)
+        gridEndTime = int(location["end_hour"] / self.TIME_BUCKET)
 
         friends = set()
-        for x in range(gridX - radius, gridX + radius):
-            for y in range(gridY - radius, gridY + radius):
-                for t in range(- timeRadius, timeRadius):
+        for x in range(gridX - radius, gridX + radius + 1):
+            for y in range(gridY - radius, gridY + radius + 1):
+                for t in range(- timeRadius, timeRadius + 1):
                     if byExitTime:
-                        searchTime = (t + gridEndTime)%self.TIME_FRAME
-                        if searchTime < 0:
-                            searchTime += self.TIME_FRAME
+                        searchTime = (t + gridEndTime)%(int(self.TIME_FRAME/self.TIME_BUCKET))
                         friends |= self.usersEndMatrix[x][y][searchTime]
                     else:
                         searchTime = (t + gridStartTime)%self.TIME_FRAME
@@ -146,9 +140,9 @@ class TimeGrid(object):
         """
         companions = {}
         for index in range(len(self.userData)-1):
-            nextLocation = index + 1
-            timeTraveled = self.userData[nextLocation]["start_time"] - self.userData[index]["end_time"]
-            while timeTraveled < self.LIMIT:
+            nextLocation = index+1
+            timeTraveled = self.userData[nextLocation]["start_hour"] - self.userData[index]["end_hour"]
+            while timeTraveled < self.LIMIT and nextLocation < len(self.userData):
                 distnaceTraveled = self.distanceOnUnitSphere(self.userData[index]["latitude"]/self.COORDINATE_RESOLUTION,
                                    self.userData[index]["longitude"]/self.COORDINATE_RESOLUTION,
                                    self.userData[nextLocation]["latitude"]/self.COORDINATE_RESOLUTION,
@@ -163,7 +157,8 @@ class TimeGrid(object):
                     companions.setdefault(trueCompanion, []).append((self.userData[index],
                                                                      self.userData[nextLocation]))
                 nextLocation += 1
-                timeTraveled = self.userData[nextLocation]["start_time"] - self.userData[index]["end_time"]
+                if nextLocation < len(self.userData):
+                    timeTraveled = self.userData[nextLocation]["start_hour"] - self.userData[index]["end_hour"]
         return companions
 
 
@@ -176,8 +171,8 @@ def getCompanions(data, user, dx, dy, alphaDistance, alphaTime):
 
 if __name__ == "__main__":
     import json
-    data = json.load(open("test.json"))
-    user = "me"
+    data = json.load(open("resources/test.json"))
+    user = "1"
     dx = 1
     dy = 1
     alphaDistance = 0.01
