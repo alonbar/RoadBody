@@ -3,6 +3,7 @@ class TimeGrid(object):
     TIME_BUCKET = 10*60*1000 # 10 minutes
     TIME_FRAME = 7*24*60*60*1000
     LIMIT = 60*60*1000
+    COORDINATE_RESOLUTION = math.pow(10,7)
     def __init__(self, userData, dx, dy):
         """
 
@@ -31,7 +32,7 @@ class TimeGrid(object):
         day, hour, minute = timeTuple
         return (((hour)*60) + minute)*60*1000
 
-    def distance_on_unit_sphere(lat1, long1, lat2, long2):
+    def distanceOnUnitSphere(self, lat1, long1, lat2, long2):
         #Convert latitude and longitude to
         #spherical coordinates in radians.
         degrees_to_radians = math.pi/180.0
@@ -105,14 +106,20 @@ class TimeGrid(object):
 
     def ouputCompatibility(self, alphaDistance, alphaTime):
         companions = {}
-        coordinationResolution = math.pow(10,7)
         for index in range(len(self.userData)-1):
             nextLocation = index + 1
             timeTraveled = self.userData[nextLocation]["start_time"] - self.userData[index]["end_time"]
             while timeTraveled < self.LIMIT:
+                distnaceFromNextLocation = self.distanceOnUnitSphere(self.userData[index]["latitude"]/self.COORDINATE_RESOLUTION,
+                                                        self.userData[index]["longitude"]/self.COORDINATE_RESOLUTION,
+                                                        self.userData[nextLocation]["latitude"]/self.COORDINATE_RESOLUTION,
+                                                        self.userData[nextLocation]["longitude"]/self.COORDINATE_RESOLUTION)
+
                 startCompanions = self.getFriendsByLocation(self.userData[index], int(timeTraveled*alphaDistance),
-                                                            int(timeTraveled*alphaTime), True)
+                                            int(timeTraveled*alphaTime), True)
                 endCompanions = self.getFriendsByLocation(self.userData[nextLocation], 1, 1, False)
+
+
                 for trueCompanion in startCompanions & endCompanions:
                     companions.setdefault(trueCompanion, []).append((self.userData[index],
                                                                      self.userData[nextLocation]))
