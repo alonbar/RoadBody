@@ -1,5 +1,8 @@
 import math
 class TimeGrid(object):
+    """
+
+    """
     TIME_BUCKET = 10*60*1000 # 10 minutes
     TIME_FRAME = 7*24*60*60*1000
     LIMIT = 60*60*1000
@@ -29,10 +32,23 @@ class TimeGrid(object):
         self.usersEndMatrix = [[[set()]*xAmount] * yAmount]*timeAmount
 
     def _normalizeTime(self, timeTuple):
+        """
+
+        :param timeTuple:
+        :return:
+        """
         day, hour, minute = timeTuple
         return (((hour)*60) + minute)*60*1000
 
     def distanceOnUnitSphere(self, lat1, long1, lat2, long2):
+        """
+
+        :param lat1:
+        :param long1:
+        :param lat2:
+        :param long2:
+        :return:
+        """
         #Convert latitude and longitude to
         #spherical coordinates in radians.
         degrees_to_radians = math.pi/180.0
@@ -62,6 +78,15 @@ class TimeGrid(object):
 
 
     def enterUserToGrid(self, userId, longitude, latitude, startTime, endTime):
+        """
+
+        :param userId:
+        :param longitude:
+        :param latitude:
+        :param startTime:
+        :param endTime:
+        :return:
+        """
         gridX = (longitude - self.gridStartX) / self.dx
         gridY = (latitude - self.gridStartY) / self.dy
         gridStartTime = self._normalizeTime(startTime) / self.TIME_BUCKET
@@ -82,6 +107,14 @@ class TimeGrid(object):
             self.enterUserToGrid(friendId, data["longitude"], data["latitude"], data["start_hour"], data["end_hour"])
 
     def getFriendsByLocation(self, location, radius, timeRadius, byExitTime):
+        """
+
+        :param location:
+        :param radius:
+        :param timeRadius:
+        :param byExitTime:
+        :return:
+        """
         gridX = (location["longitude"] - self.gridStartX) / self.dx
         gridY = (location["latitude"] - self.gridStartY) / self.dy
         gridStartTime = self._normalizeTime(location["start_hour"]) / self.TIME_BUCKET
@@ -105,18 +138,24 @@ class TimeGrid(object):
 
 
     def ouputCompatibility(self, alphaDistance, alphaTime):
+        """
+        Calculates the
+        :param alphaDistance:
+        :param alphaTime:
+        :return:
+        """
         companions = {}
         for index in range(len(self.userData)-1):
             nextLocation = index + 1
             timeTraveled = self.userData[nextLocation]["start_time"] - self.userData[index]["end_time"]
             while timeTraveled < self.LIMIT:
-                distnaceFromNextLocation = self.distanceOnUnitSphere(self.userData[index]["latitude"]/self.COORDINATE_RESOLUTION,
-                                                        self.userData[index]["longitude"]/self.COORDINATE_RESOLUTION,
-                                                        self.userData[nextLocation]["latitude"]/self.COORDINATE_RESOLUTION,
-                                                        self.userData[nextLocation]["longitude"]/self.COORDINATE_RESOLUTION)
+                distnaceTraveled = self.distanceOnUnitSphere(self.userData[index]["latitude"]/self.COORDINATE_RESOLUTION,
+                                   self.userData[index]["longitude"]/self.COORDINATE_RESOLUTION,
+                                   self.userData[nextLocation]["latitude"]/self.COORDINATE_RESOLUTION,
+                                   self.userData[nextLocation]["longitude"]/self.COORDINATE_RESOLUTION)
 
-                startCompanions = self.getFriendsByLocation(self.userData[index], int(timeTraveled*alphaDistance),
-                                            int(timeTraveled*alphaTime), True)
+                startCompanions = self.getFriendsByLocation(self.userData[index], int(distnaceTraveled*alphaDistance),
+                                                            int(timeTraveled*alphaTime), True)
                 endCompanions = self.getFriendsByLocation(self.userData[nextLocation], 1, 1, False)
 
 
@@ -128,4 +167,19 @@ class TimeGrid(object):
         return companions
 
 
+def getCompanions(data, user, dx, dy, alphaDistance, alphaTime):
+    userData = data[user]
+    friends = { friend : data[friend] for friend in data if friend != user }
+    grid = TimeGrid(userData, dx, dy)
+    grid.populateGrid(friends)
+    return grid.ouputCompatibility(alphaDistance, alphaTime)
 
+if __name__ == "__main__":
+    import json
+    data = json.load(open("test.json"))
+    user = "me"
+    dx = 1
+    dy = 1
+    alphaDistance = 0.01
+    alphaTime = 0.01
+    print (getCompanions(data, user, dx, dy, alphaDistance, alphaTime))
