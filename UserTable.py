@@ -1,28 +1,24 @@
 class UserTable:
     pass
+
+class UserTable:
+    pass
 today:  {
-    "id":
-        {timestamp_start:"",
-         timestamp_end:"",
-         latitudeE7: "",
-         longitudeE7:"",
-         time_from_last_cooredinate:"",
-         last_cooredinates: {
-            latitudeE7:"",
-            longitudeE7:""
-         }
-
-    }
     "id": [
-        {timestamp_start:"",
-         timestamp_end:"",
-         latitudeE7: "",
-         longitudeE7:"",
-         time_from_last_cooredinate:"",
-         last_cooredinates: {
-            latitudeE7:"",
-            longitudeE7:""
+        {"day": "1-7"
+        "start_hour":"",
+         "end_hour":"",
+         "latitude": "",
+         "longitude":"",
+         "from_last_coordinate":{"time":"2014-12-24 21:48:46.339999", 
+                                 "activity":"", "expected_velocity": "INT",
+                                 "max_velocity": "INT", "is_endpoint":"BOOLEAN"
+                                 },
+         
+         "last_coordinates": {
+            "latitude":"",
+            "longitude":""
          }
-
+         "other":{"heading":"INT"}
+        ]
 }
-
