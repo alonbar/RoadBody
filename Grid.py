@@ -1,5 +1,6 @@
 import math
 import sys
+import json
 # from bokeh.sampledata import us_states, us_counties, unemployment
 # from bokeh.plotting import *
 COORDINATE_RESOLUTION = math.pow(10,7)
@@ -206,7 +207,11 @@ class TimeGrid(object):
         print("---------------")
         # print (compnionsWithDistance)
         print("---------------")
+        # print(suggestedCompanionPerLocation)
+        print("---------------")
+        # print (json.dumps(suggestedCompanionPerLocation))
         print(suggestedCompanionPerLocation)
+        print("------")
 
 
 def getCompanions(data, user, dx, dy, alphaDistance, alphaTime):
