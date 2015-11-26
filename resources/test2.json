@@ -10,14 +10,14 @@
 			{
 			"start_hour":38880000,
 			 "end_hour":50400000,
-			 "latitude": 317945785,
-			 "longitude":352414009,
+			 "latitude": 317955785,
+			 "longitude":352424009,
 			 "other":{"heading":"INT"}
 			},
 			{		
 			"start_hour":52200000,
 			 "end_hour":57600000,
-			 "latitude": 317794440,
+			 "latitude": 317804440,
 			 "longitude":352103580,
 			 "other":{"heading":"INT"}
 			 },
@@ -31,8 +31,8 @@
 			 {		
 			"start_hour":79632000,
 			 "end_hour":90000000,
-			 "latitude": 317794440,
-			 "longitude":352103580,
+			 "latitude": 317784440,
+			 "longitude":352113580,
 			 "other":{"heading":"INT"}
 			 }
 			 
@@ -41,28 +41,28 @@
 			{				
 			"start_hour":25200000,
 			 "end_hour":37836000,
-			 "latitude": 317806669,
-			 "longitude":352118845
+			 "latitude": 317816669,
+			 "longitude":352119845
 			 },
 			{
 			"start_hour":39780000,
 			 "end_hour":43380000,
-			 "latitude": 317945578,
+			 "latitude": 317935578,
 			 "longitude":352414009,
 			 "other":{"heading":"INT"}
 			},
 			{
 			"start_hour":46800000,
 			 "end_hour":72360000,
-			 "latitude": 320700544,
+			 "latitude": 320710544,
 			 "longitude":347941211,
 			 "other":{"heading":"INT"}
 			},
 			{
 			"start_hour":80280000,
 			 "end_hour":93600000,
-			 "latitude": 317806669,
-			 "longitude":352118845,
+			 "latitude": 317796669,
+			 "longitude":352108845,
 			 "other":{"heading":"INT"}
 			}
 		]

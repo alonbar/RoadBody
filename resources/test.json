@@ -51,13 +51,13 @@
 			 "longitude":352414009,
 			 "other":{"heading":"INT"}
 			},
-			"start_hour":46800000,
+			{"start_hour":46800000,
 			 "end_hour":72360000,
 			 "latitude": 320700544,
 			 "longitude":347941211,
 			 "other":{"heading":"INT"}
 			},
-			"start_hour":80280000,
+			{"start_hour":80280000,
 			 "end_hour":93600000,
 			 "latitude": 317806669,
 			 "longitude":352118845,
