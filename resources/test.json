@@ -29,6 +29,21 @@
 			 "latitude": 317757818,
 			 "longitude":352166722
 			}
+		],
+		
+	"3" :[
+			{				
+			"start_hour":295200000,
+			 "end_hour":295800000,
+			 "latitude": 312794490,
+			 "longitude":322103590
+			 },
+			{
+			"start_hour":309600000,
+			 "end_hour":316800000,
+			 "latitude": 317257898,
+			 "longitude":352166792
+			}
 		]
 		
 }
