@@ -1,8 +1,8 @@
 {
     "alon": [
 			{		
-			"start_hour":28802500,
-			 "end_hour":37836000,
+			"start_hour":288025000,
+			 "end_hour":378360000,
 			 "latitude": 31779444,
 			 "longitude":35210358,
 			 "other":{"heading":"INT"}
@@ -51,63 +51,19 @@
 			 "longitude":352414009,
 			 "other":{"heading":"INT"}
 			},
+			{
 			"start_hour":46800000,
 			 "end_hour":72360000,
 			 "latitude": 320700544,
 			 "longitude":347941211,
 			 "other":{"heading":"INT"}
 			},
+			{
 			"start_hour":80280000,
 			 "end_hour":93600000,
 			 "latitude": 317806669,
 			 "longitude":352118845,
 			 "other":{"heading":"INT"}
-			}
-		],
-
-		 "leshem": [
-			{
-			"start_hour":295200000,
-			 "end_hour":295800000,
-			 "latitude": 317794430,
-			 "longitude":352103570,
-			 "other":{"heading":"INT"}
-			 }
-        ,
-			{
-			"start_hour":309600000,
-			 "end_hour":316800000,
-			 "latitude": 317757818,
-			 "longitude":352166722,
-			 "other":{"heading":"INT"}
-			}
-		],
-	"gal" :[
-			{				
-			"start_hour":295200000,
-			 "end_hour":295800000,
-			 "latitude": 312794490,
-			 "longitude":322103590
-			 },
-			{
-			"start_hour":309600000,
-			 "end_hour":316800000,
-			 "latitude": 317257898,
-			 "longitude":352166792
-			}
-		],
-		"tomer" :[
-			{				
-			"start_hour":295200000,
-			 "end_hour":295800000,
-			 "latitude": 312794490,
-			 "longitude":322103590
-			 },
-			{
-			"start_hour":309600000,
-			 "end_hour":316800000,
-			 "latitude": 317257898,
-			 "longitude":352166792
 			}
 		]
 		
