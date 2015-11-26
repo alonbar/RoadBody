@@ -9,7 +9,7 @@ class TimeGrid(object):
     """
     TIME_BUCKET = 10*60*1000 # 10 minutes
     TIME_FRAME = 7*24*60*60*1000
-    LIMIT = 10*60*60*1000
+    LIMIT = 2*60*60*1000
 
     def __init__(self, userData, dx, dy):
         """
@@ -24,21 +24,41 @@ class TimeGrid(object):
         self.userData = userData
         self.dx = dx
         self.dy = dy
-        self.gridStartX = min(location["longitude"] for location in userData) - self.dx*100
-        self.gridStartY = min(location["latitude"] for location in userData) - self.dy*100
-        gridEndX = max(location["longitude"] for location in userData) + self.dx*100
-        gridEndY = max(location["latitude"] for location in userData) + self.dy*100
+        self.gridStartX = float("inf")
+        self.gridStartY = float("inf")
+        for location in userData:
+            if location["longitude"] < self.gridStartX:
+                self.gridStartX = location["longitude"]
+            if location["latitude"] <  self.gridStartY:
+                self.gridStartY = location["latitude"]
+        self.gridStartX = self.gridStartX - 100
+        self.gridStartY =  self.gridStartY - 100
+        self.gridEndX = -float("inf")
+        self.gridEndY = -float("inf")
+        for location in userData:
+            if location["longitude"] > self.gridEndX:
+                self.gridEndX = location["longitude"]
+            if location["latitude"] > self.gridEndY:
+                self.gridEndY = location["latitude"]
+        self.gridEndX = self.gridEndX - 100
+        self.gridEndY = self.gridEndY - 100
+        self.xAmount = int(((self.gridEndX - self.gridStartX) / (self.dx)) + 1)
+        self.yAmount = int(((self.gridEndY - self.gridStartY) / (self.dy)) + 1)
 
-        self.xAmount = int((gridEndX - self.gridStartX) / self.dx + 1)
-        self.yAmount = int((gridEndY - self.gridStartY) / self.dy + 1)
         self.timeAmount = int(self.TIME_FRAME / self.TIME_BUCKET + 1)
         print (self.xAmount, self.yAmount, self.timeAmount)
-        self.usersStartMatrix = [[[{}]*self.timeAmount] * self.yAmount]*self.xAmount
-        self.usersEndMatrix = [[[{}]*self.timeAmount] * self.yAmount]*self.xAmount
+        self.usersStartMatrix = []
+        self.usersEndMatrix = []
+        for x in range(self.xAmount):
+            self.usersStartMatrix.append([])
+            self.usersEndMatrix.append([])
+            for y in range(self.yAmount):
+                self.usersStartMatrix[x].append([])
+                self.usersEndMatrix[x].append([])
+                for t in range(self.timeAmount):
 
-
-
-
+                    self.usersStartMatrix[x][y].append({})
+                    self.usersEndMatrix[x][y].append({})
 
     def enterUserToGrid(self, userId, longitude, latitude, startTime, endTime):
         """
@@ -59,7 +79,7 @@ class TimeGrid(object):
                 self.usersStartMatrix[gridX][gridY][gridStartTime][userId] = set()
             self.usersStartMatrix[gridX][gridY][gridStartTime][userId].add((latitude,longitude))
             if userId not in self.usersEndMatrix[gridX][gridY][gridEndTime]:
-                self.usersEndMatrix[gridX][gridY][gridStartTime][userId] = set()
+                self.usersEndMatrix[gridX][gridY][gridEndTime][userId] = set()
             self.usersEndMatrix[gridX][gridY][gridEndTime][userId].add((latitude,longitude))
 
     def populateGrid(self, friendsData):
@@ -94,16 +114,18 @@ class TimeGrid(object):
         cnt = 0
         for x in range(gridX - radius, gridX + radius + 1):
             for y in range(gridY - radius, gridY + radius + 1):
-                for t in range(- timeRadius, timeRadius +1 ):
+                for t in range(- 4, timeRadius +1 ):
                     cnt +=1
                     if byExitTime:
                         searchTime = (t + gridEndTime)%(int(self.TIME_FRAME/self.TIME_BUCKET))
-                        friends.update(self.usersEndMatrix[x][y][searchTime])
+                        if ((x >= 0)  & (x < self.xAmount) & (y >= 0) & (y < self.yAmount) & (searchTime < self.timeAmount) & (searchTime >= 0)):
+                            friends.update(self.usersEndMatrix[x][y][searchTime])
                     else:
                         searchTime = (t + gridStartTime)%self.TIME_FRAME
                         if searchTime < 0:
                             searchTime += self.TIME_FRAME
-                        friends.update(self.usersStartMatrix[x][y][searchTime])
+                        if ((x >= 0)  & (x < self.xAmount) & (y >= 0) & (y < self.yAmount) & (searchTime < self.timeAmount) & (searchTime >= 0)):
+                            friends.update(self.usersStartMatrix[x][y][searchTime])
         return friends
 
 
@@ -128,7 +150,7 @@ class TimeGrid(object):
 
                 startCompanions = self.getFriendsByLocation(self.userData[index], int(distnaceTraveled*alphaDistance),
                                                             int(timeTraveled*alphaTime), True)
-                endCompanions = self.getFriendsByLocation(self.userData[nextLocation], 1, 1, False)
+                endCompanions = self.getFriendsByLocation(self.userData[nextLocation], int(distnaceTraveled*alphaDistance),  int(timeTraveled*alphaTime), False)
 
                 for trueCompanion in (startCompanions.keys() & endCompanions.keys()):
                     companions.setdefault(trueCompanion, []).append(((self.userData[index],
@@ -145,34 +167,44 @@ class TimeGrid(object):
         compnionsWithDistance = {}
         for companion in companions:
             for matching in companions[companion]:
-                for userLocation, companionLocations in matching:
-                    minDistance = sys.maxsize # max int ?
-                    xAxis = int ( (userLocation["longitude"] - self.gridStartX)/self.dx)
-                    yAxis = int ( (userLocation["latitude"] - self.gridStartY)/self.dy)
-                    currentCoordinate = Coordination(xAxis, yAxis)
-                    # if (xAxis, yAxis) not in suggestedCompanionPerLocation:
-                    #     suggestedCompanionPerLocation.setdefault((xAxis, yAxis), []).append((companion, xAxis, yAxis, sys.maxsize))
-                        # suggestedCompanionPerLocation[(xAxis, yAxis)] = (companion, xAxis, yAxis, sys.maxsize)
-                    for latitude, longitude in companionLocations:
-                        distance = distanceOnUnitSphere(userLocation["latitude"],
-                                                                  userLocation["longitude"],
-                                                                  latitude,
-                                                                  longitude
-                                                                  )
-                        suggestedCompanionPerLocation.setdefault((userLocation["latitude"], userLocation["longitude"]), []).append((companion, latitude, longitude, distance))
-                                # suggestedCompanionPerLocation[(xAxis, yAxis)] = (companion, latitude, longitude, distance)
+                startLocation, endLocation = matching
+                maxEndLocation = float("inf")
+                maxEndCoordination = ()
+                maxStartLocation = float("inf")
+                maxStartCoordination = ()
+                for locations in startLocation[1]:
+                    distance =  distanceOnUnitSphere(startLocation[0]["latitude"], startLocation[0]["longitude"], locations[0],locations[1])
+                    if (distance < maxStartLocation):
+                        maxStartLocation = distance
+                        maxStartCoordination = locations;
 
-                        locationWithDistance = (userLocation, latitude, longitude, distance)
-                        if companion not in compnionsWithDistance:
-                            compnionsWithDistance[companion] = []
-                        compnionsWithDistance[companion].append(locationWithDistance)
+                for locations in endLocation[1]:
+                    distance =  distanceOnUnitSphere(endLocation[0]["latitude"], endLocation[0]["longitude"], locations[0],locations[1])
+                    if (distance < maxEndLocation):
+                        maxEndLocation = distance
+                        maxEndCoordination = locations
+                    candidateDistance = min(maxStartLocation, maxEndLocation)
+                    locationCandidate = {
+                                        "maxStartLocation" : maxStartLocation,
+                                        "maxStartCoordination" : maxStartCoordination,
+                                        "maxEndLocation" : maxEndLocation,
+                                        "maxEndCoordination" : maxEndCoordination,
+                                        "companion" : companion,
+                                        "candidateDistance": candidateDistance}
+
+                    suggestedCompanionPerLocation.setdefault((startLocation[0]["latitude"], startLocation[0]["longitude"],endLocation[0]["latitude"], endLocation[0]["longitude"]) , []).append(locationCandidate)
+
+                # locationWithDistance = (startLocation, latitude, longitude, distance)
+                # if companion not in compnionsWithDistance:
+                #     compnionsWithDistance[companion] = []
+                # compnionsWithDistance[companion].append(locationWithDistance)
 
         keys = suggestedCompanionPerLocation.keys();
         for key in keys:
-            suggestedCompanionPerLocation[key].sort(key=lambda x:x[3])
-        print (companions)
+            suggestedCompanionPerLocation[key].sort(key=lambda x:x["candidateDistance"])
+        # print (companions)
         print("---------------")
-        print (compnionsWithDistance)
+        # print (compnionsWithDistance)
         print("---------------")
         print(suggestedCompanionPerLocation)
 
@@ -237,14 +269,12 @@ class Coordination(object):
         self.lat = lat
         self.long = long
 
-
-
 if __name__ == "__main__":
     import json
     data = json.load(open("resources/test2.json"))
     user = "alon"
-    dx = 10
-    dy = 10
-    alphaDistance = 0.00
-    alphaTime = 0.00
+    dx = 100000
+    dy = 100000
+    alphaDistance = 0.0000001
+    alphaTime = 0.00001
     getCompanions(data, user, dx, dy, alphaDistance, alphaTime)

@@ -1,10 +1,10 @@
 {
     "alon": [
 			{		
-			"start_hour":288025000,
-			 "end_hour":378360000,
-			 "latitude": 31779444,
-			 "longitude":35210358,
+			"start_hour":28802500,
+			 "end_hour":37836000,
+			 "latitude": 317794440,
+			 "longitude":352103580,
 			 "other":{"heading":"INT"}
 			 },	 
 			{
@@ -17,8 +17,8 @@
 			{		
 			"start_hour":52200000,
 			 "end_hour":57600000,
-			 "latitude": 31779444,
-			 "longitude":35210358,
+			 "latitude": 317794440,
+			 "longitude":352103580,
 			 "other":{"heading":"INT"}
 			 },
 			 {		
@@ -31,8 +31,8 @@
 			 {		
 			"start_hour":79632000,
 			 "end_hour":90000000,
-			 "latitude": 31779444,
-			 "longitude":35210358,
+			 "latitude": 317794440,
+			 "longitude":352103580,
 			 "other":{"heading":"INT"}
 			 }
 			 
@@ -40,7 +40,7 @@
 	"dana" :[
 			{				
 			"start_hour":25200000,
-			 "end_hour":37838700,
+			 "end_hour":37836000,
 			 "latitude": 317806669,
 			 "longitude":352118845
 			 },
