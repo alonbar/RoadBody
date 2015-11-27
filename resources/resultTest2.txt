@@ -1,0 +1,2 @@
+{(320728374, 347931619, 317784440, 352113580): [{'candidateDistance': 0.14320182940068715, 'maxStartCoordination': (320710544, 347941211), 'companion': 'dana', 'maxEndLocation': 0.14320182940068715, 'maxEndCoordination': (317796669, 352108845), 'maxStartLocation': 0.2179578978316061}], (317794440, 352103580, 317955785, 352424009): [{'candidateDistance': 0.24383528083988248, 'maxStartCoordination': (317816669, 352119845), 'companion': 'dana', 'maxEndLocation': 0.24383528083988248, 'maxEndCoordination': (317935578, 352414009), 'maxStartLocation': 0.291179676322922}]}
+------
